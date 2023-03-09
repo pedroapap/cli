@@ -1,13 +1,10 @@
-using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using Cmf.CLI.Core;
 using Cmf.CLI.Core.Objects;
+using Spectre.Console;
 
 namespace Cmf.CLI.Utilities
 {
@@ -219,7 +216,7 @@ namespace Cmf.CLI.Utilities
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="envVarName"></param>
         /// <returns></returns>
@@ -228,6 +225,35 @@ namespace Cmf.CLI.Utilities
             var enableConsoleExporter = System.Environment.GetEnvironmentVariable(envVarName);
             return enableConsoleExporter is "1" or "true" or "TRUE" or "True";
         }
+
+        public static string NodeLocation()
+        {
+            string nodeDir = string.Empty;
+            string? ENV_PATH = Environment.GetEnvironmentVariable("PATH");
+            if (ENV_PATH != null)
+            {
+                string[] pathDirs = ENV_PATH.Split(Path.PathSeparator);
+                string nodeExecutableName = Environment.OSVersion.Platform == PlatformID.Win32NT ? "node.exe" : "node";
+
+                foreach (string dir in pathDirs)
+                {
+                    string nodePath = Path.Combine(dir, nodeExecutableName);
+
+                    if (File.Exists(nodePath))
+                    {
+                        nodeDir = Path.GetDirectoryName(nodePath);
+                    }
+                }
+            }
+
+            if (string.IsNullOrEmpty(nodeDir))
+            {
+                throw new CliException("Node.js installation folder not found.");
+            }
+
+            return nodeDir;
+        }
+
         #endregion Public Methods
 
         #region Private Methods
@@ -259,6 +285,7 @@ namespace Cmf.CLI.Utilities
                 }
             }
         }
-        #endregion
+
+        #endregion Private Methods
     }
 }

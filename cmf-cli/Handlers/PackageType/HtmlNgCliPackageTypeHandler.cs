@@ -8,16 +8,16 @@ using Cmf.CLI.Core.Objects;
 namespace Cmf.CLI.Handlers
 {
     /// <summary>
-    ///
+    /// Handler for packages managed with @angular/cli
     /// </summary>
     /// <seealso cref="PresentationPackageTypeHandler" />
-    public class HtmlPackageTypeHandler : PresentationPackageTypeHandler
+    public class HtmlNgCliPackageTypeHandler : PresentationPackageTypeHandler
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="HtmlPackageTypeHandler" /> class.
+        /// Initializes a new instance of the <see cref="HtmlGulpPackageTypeHandler" /> class.
         /// </summary>
         /// <param name="cmfPackage"></param>
-        public HtmlPackageTypeHandler(CmfPackage cmfPackage) : base(cmfPackage)
+        public HtmlNgCliPackageTypeHandler(CmfPackage cmfPackage) : base(cmfPackage)
         {
             cmfPackage.SetDefaultValues
             (
@@ -30,7 +30,7 @@ namespace Cmf.CLI.Handlers
                     {
                         new Step(StepType.DeployFiles)
                         {
-                            ContentPath = "bundles/**"
+                            ContentPath = "**"
                         }
                     }
             );
@@ -46,31 +46,19 @@ namespace Cmf.CLI.Handlers
                         command.Execute(cmfPackage.GetFileInfo().Directory, null);
                     }
                 },
-                new NPMCommand()
+                ///TO-DO: Projects logic
+                //new NgCommand()
+                //{
+                //    DisplayName = "ng build",
+                //    Command = "build",
+                //    WorkingDirectory = cmfPackage.GetFileInfo().Directory
+                //},
+                new NgCommand()
                 {
-                    DisplayName = "NPM Install",
-                    Command  = "install",
-                    Args = new []{ "--force" },
+                    DisplayName = "ng build",
+                    Command = "build",
                     WorkingDirectory = cmfPackage.GetFileInfo().Directory
-                },
-                new GulpCommand()
-                {
-                    GulpFile = "gulpfile.js",
-                    Task = "install",
-                    DisplayName = "Gulp Install",
-                    GulpJS = "node_modules/gulp/bin/gulp.js",
-                    Args = new [] { "--update" },
-                    WorkingDirectory = cmfPackage.GetFileInfo().Directory
-                },
-                new GulpCommand()
-                {
-                    GulpFile = "gulpfile.js",
-                    Task = "build",
-                    DisplayName = "Gulp Build",
-                    GulpJS = "node_modules/gulp/bin/gulp.js",
-                    Args = new [] { "--production" , "--dist", "--brotli"},
-                    WorkingDirectory = cmfPackage.GetFileInfo().Directory
-                },
+                }
             };
 
             cmfPackage.DFPackageType = PackageType.Presentation;
