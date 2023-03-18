@@ -57,10 +57,13 @@ namespace Cmf.CLI.Builders
                 ps.RedirectStandardOutput = true;
                 ps.RedirectStandardError = true;
 
-                foreach(var envVar in step.EnvironmentVariables)
+                if(step.EnvironmentVariables.HasAny())
                 {
-                    ps.EnvironmentVariables.Add(envVar.Key, envVar.Value);
-                }
+                    foreach (var envVar in step.EnvironmentVariables)
+                    {
+                        ps.EnvironmentVariables.Add(envVar.Key, envVar.Value);
+                    }
+                }                
 
                 using var process = System.Diagnostics.Process.Start(ps);
                 process.OutputDataReceived += (sender, args) => Log.Verbose(args.Data);

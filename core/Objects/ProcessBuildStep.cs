@@ -42,6 +42,12 @@ public class ProcessBuildStep : IEquatable<ProcessBuildStep>
     [JsonProperty(Order = 3)]
     public IDirectoryInfo WorkingDirectory { get; set; }
 
+    /// <summary>
+    /// Gets or sets the environment variables.
+    /// </summary>
+    /// <value>
+    /// The environment variables to be used on a given ProcessBuildStep
+    /// </value>
     [JsonProperty(Order = 4)]
     public Dictionary<string, string> EnvironmentVariables { get; set; }
 

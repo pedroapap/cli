@@ -1,9 +1,14 @@
-﻿
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Abstractions;
+using System.Linq;
 using Cmf.CLI.Builders;
 using Cmf.CLI.Commands.restore;
 using Cmf.CLI.Core.Enums;
 using Cmf.CLI.Core.Objects;
+using Newtonsoft.Json;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Cmf.CLI.Handlers
 {
@@ -36,7 +41,7 @@ namespace Cmf.CLI.Handlers
             );
 
             BuildSteps = new IBuildCommand[]
-            {
+{
                 new ExecuteCommand<RestoreCommand>()
                 {
                     Command = new RestoreCommand(),
@@ -46,22 +51,31 @@ namespace Cmf.CLI.Handlers
                         command.Execute(cmfPackage.GetFileInfo().Directory, null);
                     }
                 },
-                ///TO-DO: Projects logic
-                //new NgCommand()
-                //{
-                //    DisplayName = "ng build",
-                //    Command = "build",
-                //    WorkingDirectory = cmfPackage.GetFileInfo().Directory
-                //},
-                new NgCommand()
+                new NPMCommand()
                 {
-                    DisplayName = "ng build",
-                    Command = "build",
+                    DisplayName = "NPM Install",
+                    Command  = "install",
+                    Args = new []{ "--force" },
                     WorkingDirectory = cmfPackage.GetFileInfo().Directory
                 }
-            };
+};
 
             cmfPackage.DFPackageType = PackageType.Presentation;
+
+            // Projects BuildSteps
+            var workspace = new AngularWorkspace(cmfPackage.GetFileInfo().Directory);
+            foreach (var package in workspace.PackagesToBuild)
+            {
+                BuildSteps = BuildSteps.Concat(new IBuildCommand[]
+                {
+                    new NgCommand()
+                    {
+                        DisplayName = $"ng build {package.Key}",
+                        Command = "build",
+                        WorkingDirectory = package.Value
+                    }
+                }).ToArray();
+            }
         }
     }
 }
