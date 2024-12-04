@@ -539,11 +539,9 @@ namespace Cmf.CLI.Core.Objects
                     throw new CliException(CoreMessages.UrlsNotSupported);
                 }
 
-                IDirectoryInfo[] repoDirectories = repoUris?.Select(r => r.GetDirectory()).ToArray();
-                var missingRepoDirectories = repoDirectories?.Where(r => r.Exists == false).ToArray();
-                if (missingRepoDirectories.HasAny())
+                IDirectoryInfo[] repoDirectories = repoUris?.Select(r => r.GetDirectory()).Where(d=> d.Exists==true).ToArray();                if (repoDirectories.Length == 0)
                 {
-                    throw new CliException($"Some of the provided repositories do not exist: {string.Join(", ", missingRepoDirectories.Select(d => d.FullName))}");
+                    throw new CliException($"None of the provided repositories exist: {string.Join(", ", repoUris.Select(d => d.OriginalString))}");
                 }
                 foreach (var dependency in this.Dependencies)
                 {
